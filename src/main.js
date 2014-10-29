@@ -1,4 +1,4 @@
-parseShoppingList = function (inputs) {
+function parseShoppingList (inputs) {
     var shoppingList = {};
     for(var i=0; i<=inputs.length-1; i++) {
         var barCode = inputs[i];
@@ -16,7 +16,7 @@ parseShoppingList = function (inputs) {
         }
     }
     return shoppingList
-};
+}
 
 function generatePromotionsList (shoppingList) {
     var promotions = loadPromotions();
@@ -64,8 +64,7 @@ function Inventory(shoppingList){
     this.promotionList = populateList(generatePromotionsList(shoppingList));
     this.totalPrice = 0;
     this.totalSaved = 0;
-    this.printShoppingList = function(){
-        var message = '';
+    this.account = function(){
         for(var barCode in this.shoppingList){
             var payNumber;
             if(this.promotionList.hasOwnProperty(barCode)){
@@ -79,45 +78,47 @@ function Inventory(shoppingList){
             this.shoppingList[barCode].sum = (this.shoppingList[barCode].price * payNumber);
             this.totalPrice += this.shoppingList[barCode].sum;
             this.totalSaved += this.shoppingList[barCode].saved;
-            message +=
-                '名称：' + this.shoppingList[barCode].name +'，'+
-                '数量：' + this.shoppingList[barCode].number + this.shoppingList[barCode].unit + '，' +
-                '单价：' + this.shoppingList[barCode].price.toFixed(2) + '(元)，' +
-                '小计：' + this.shoppingList[barCode].sum.toFixed(2) + '(元)\n';
         }
-        return message;
+        return this;
     };
-    this.printPromotionList = function(){
-        var message='';
-        for(var barCode in this.promotionList){
-            message +=
-                '名称：' + this.promotionList[barCode].name + '，'+
-                '数量：' + this.promotionList[barCode].number +  this.promotionList[barCode].unit + '\n';
-        }
-        return message;
+    this.getTotalPrice = function(){
+        return this.totalPrice;
     };
-    this.printTotalPrice = function(){
-        return '总计：'+ this.totalPrice.toFixed(2) + '(元)\n';
-    };
-    this.printTotalSaved = function(){
-        return '节省：' + this.totalSaved.toFixed(2) + '(元)\n';
+    this.getTotalSaved = function(){
+        return this.totalSaved;
     };
 }
 
-
+function printToConsole(inventory){
+    var receipt = '';
+    receipt += '***<没钱赚商店>购物清单***\n';
+    //add shopping list
+    for(var barCode in inventory.shoppingList){
+        receipt +=
+            '名称：' + inventory.shoppingList[barCode].name +'，'+
+            '数量：' + inventory.shoppingList[barCode].number + inventory.shoppingList[barCode].unit + '，' +
+            '单价：' + inventory.shoppingList[barCode].price.toFixed(2) + '(元)，' +
+            '小计：' + inventory.shoppingList[barCode].sum.toFixed(2) + '(元)\n';
+    }
+    receipt += '----------------------\n';
+    receipt += '挥泪赠送商品：\n';
+    //add promotion list
+    for(var barCode in inventory.promotionList){
+        receipt +=
+            '名称：' + inventory.promotionList[barCode].name + '，'+
+            '数量：' + inventory.promotionList[barCode].number +  inventory.promotionList[barCode].unit + '\n';
+    }
+    receipt += '----------------------\n';
+    //add total price
+    receipt += '总计：'+ inventory.getTotalPrice().toFixed(2) + '(元)\n';
+    //add total saved
+    receipt += '节省：' + inventory.getTotalSaved().toFixed(2) + '(元)\n';
+    receipt += '**********************';
+    console.log(receipt);
+}
 
 var printInventory = function(inputs){
     var shoppingList = parseShoppingList(inputs);
     var inventory = new Inventory(shoppingList);
-    console.log(
-        '***<没钱赚商店>购物清单***\n' +
-        inventory.printShoppingList() +
-        '----------------------\n' +
-        '挥泪赠送商品：\n' +
-        inventory.printPromotionList() +
-        '----------------------\n' +
-        inventory.printTotalPrice() +
-        inventory.printTotalSaved() +
-        '**********************'
-    );
+    printToConsole(inventory.account());
 };
