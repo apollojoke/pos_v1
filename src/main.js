@@ -1,5 +1,5 @@
 parseShoppingList = function (inputs) {
-    var list = {};
+    var shoppingList = {};
     for(var i=0; i<=inputs.length-1; i++) {
         var barCode = inputs[i];
         var itemNum = 1;
@@ -8,17 +8,17 @@ parseShoppingList = function (inputs) {
             itemNum = parseInt(inputs[i].split('-')[1]);
         }
 
-        if (list.hasOwnProperty(barCode)) {
-            list[barCode] += itemNum;
+        if (shoppingList.hasOwnProperty(barCode)) {
+            shoppingList[barCode] += itemNum;
         }
         else {
-            list[barCode] = itemNum;
+            shoppingList[barCode] = itemNum;
         }
     }
-    return list
+    return shoppingList
 };
 
-generatePromotionsList = function (shoppingList) {
+function generatePromotionsList (shoppingList) {
     var promotions = loadPromotions();
     var promotionList = {};
     for(var i=0; i<= promotions.length-1; i++){
@@ -39,19 +39,19 @@ generatePromotionsList = function (shoppingList) {
         }
     }
     return promotionList;
-};
+}
 
 function populateList(list) {
     var items = {};
     var allItems = loadAllItems();
-    for(var i in list ){
-        for(var j=0;j<= allItems.length-1; j++){
-            if(allItems[j].barcode === i){
-                items[i] = {
-                    name : allItems[j].name,
-                    unit: allItems[j].unit,
-                    price: allItems[j].price,
-                    number : list[i]
+    for(var barCode in list ){
+        for(var i=0; i<= allItems.length-1; i++){
+            if(allItems[i].barcode === barCode){
+                items[barCode] = {
+                    name : allItems[i].name,
+                    unit: allItems[i].unit,
+                    price: allItems[i].price,
+                    number : list[barCode]
                 }
             }
         }
@@ -96,7 +96,7 @@ function Inventory(shoppingList){
         }
         return message;
     };
-    this.printSum = function(){
+    this.printTotalPrice = function(){
         return '总计：'+ this.totalPrice.toFixed(2) + '(元)\n';
     };
     this.printTotalSaved = function(){
@@ -116,7 +116,7 @@ var printInventory = function(inputs){
         '挥泪赠送商品：\n' +
         inventory.printPromotionList() +
         '----------------------\n' +
-        inventory.printSum() +
+        inventory.printTotalPrice() +
         inventory.printTotalSaved() +
         '**********************'
     );
